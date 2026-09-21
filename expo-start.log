@@ -1,0 +1,49 @@
+npm notice run nutrifit-app@57.0.22 npx
+npm notice run expo start --tunnel
+Starting project at C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app
+Using src/app as the root directory for Expo Router.
+React Compiler enabled
+Starting Metro Bundler
+
+Tunnel connected.
+Tunnel ready.
+Waiting on http://localhost:8081
+
+Logs for your project will appear below.
+iOS Bundled 1052ms node_modules\expo-router\entry.js (1643 modules)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
+iOS Bundled 56ms node_modules\expo-router\entry.js (1 module)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
+iOS Bundled 60ms node_modules\expo-router\entry.js (1 module)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
+iOS Bundled 1500ms node_modules\expo-router\entry.js (1 module)
+iOS Bundled 39ms node_modules\expo-router\entry.js (1 module)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
+iOS Bundled 41ms node_modules\expo-router\entry.js (1 module)
+iOS Bundled 42ms node_modules\expo-router\entry.js (1 module)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
+iOS Bundled 53ms node_modules\expo-router\entry.js (1 module)
+iOS Bundled 40ms node_modules\expo-router\entry.js (1 module)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
+iOS Bundled 565ms node_modules\expo-router\entry.js (1 module)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
+λ Bundled 3899ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1445 modules)
+"shadow*" style props are deprecated. Use "boxShadow".
+Web Bundling failed 4671ms node_modules\expo-router\entry.js (1423 modules)
+
+Metro error: Worker chunk not found for: C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app\node_modules\expo-sqlite\web\worker.ts
+
+  AssertionError [ERR_ASSERTION]: Worker chunk not found for: C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app\node_modules\expo-sqlite\web\worker.ts
+    at includeModule (C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app\node_modules\@expo\metro-config\build\serializer\serializeChunks.js:525:42)
+    at includeModule (C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app\node_modules\@expo\metro-config\build\serializer\serializeChunks.js:537:25)
+    at includeModule (C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app\node_modules\@expo\metro-config\build\serializer\serializeChunks.js:537:25)
+    at includeModule (C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app\node_modules\@expo\metro-config\build\serializer\serializeChunks.js:537:25)
+    at includeModule (C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app\node_modules\@expo\metro-config\build\serializer\serializeChunks.js:537:25)
+    at includeModule (C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app\node_modules\@expo\metro-config\build\serializer\serializeChunks.js:537:25)
+    at includeModule (C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app\node_modules\@expo\metro-config\build\serializer\serializeChunks.js:537:25)
+    at includeModule (C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app\node_modules\@expo\metro-config\build\serializer\serializeChunks.js:537:25)
+    at includeModule (C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app\node_modules\@expo\metro-config\build\serializer\serializeChunks.js:537:25)
+    at includeModule (C:\Users\CLK096\OneDrive - Grupo Click Seguros y Fianzas\Documentos\Proyectos\NutriFit\nutrifit-app\node_modules\@expo\metro-config\build\serializer\serializeChunks.js:537:25)
+iOS Bundled 54ms node_modules\expo-router\entry.js (1 module)
+iOS Bundled 44ms node_modules\expo-router\entry.js (1 module)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
