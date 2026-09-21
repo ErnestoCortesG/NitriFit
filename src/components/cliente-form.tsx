@@ -89,9 +89,15 @@ function Field({
 export function ClienteForm({
   value,
   onChange,
+  footer,
 }: {
   value: ClienteFormValue;
   onChange: (v: ClienteFormValue) => void;
+  // Contenido opcional al final del formulario, dentro del mismo scroll —
+  // usado por la pantalla de edición para "Eliminar cliente": una acción
+  // destructiva no debe compartir header con Compartir/Guardar, así que se
+  // manda hasta abajo, requiriendo scroll intencional para llegar a ella.
+  footer?: React.ReactNode;
 }) {
   const theme = useTheme();
   const set = <K extends keyof ClienteFormValue>(key: K, val: ClienteFormValue[K]) =>
@@ -193,6 +199,8 @@ export function ClienteForm({
           style={[inputStyle, styles.inputSmall]}
         />
       </Field>
+
+      {footer}
     </ScrollView>
   );
 }

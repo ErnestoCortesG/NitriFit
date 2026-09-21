@@ -32,6 +32,7 @@ import {
 import { useTheme } from '@/hooks/use-theme';
 import { type AlimentoBusqueda, buscarAlimentos } from '@/lib/alimentos-buscador';
 import { pesoPromedioPieza } from '@/lib/alimentos-es';
+import { exportarRecetaPdf } from '@/lib/pdf-receta';
 
 type Unidad = 'gramos' | 'piezas';
 
@@ -276,6 +277,21 @@ export default function RecetaEditorScreen() {
     cargar();
   };
 
+  const [exportando, setExportando] = useState(false);
+
+  const compartirPdf = async () => {
+    if (!receta || exportando) return;
+    setExportando(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    try {
+      await exportarRecetaPdf(receta, items, clienteNombre);
+    } catch {
+      Alert.alert('No se pudo exportar', 'Ocurrió un problema al generar el PDF. Intenta de nuevo.');
+    } finally {
+      setExportando(false);
+    }
+  };
+
   const confirmarEliminarReceta = () => {
     Alert.alert('Eliminar receta', `¿Eliminar "${receta?.nombre}"? Esta acción no se puede deshacer.`, [
       { text: 'Cancelar', style: 'cancel' },
@@ -298,9 +314,19 @@ export default function RecetaEditorScreen() {
         options={{
           title: 'Receta',
           headerRight: () => (
-            <AnimatedPressable onPress={confirmarEliminarReceta} hitSlop={8}>
-              <Ionicons name="trash-outline" size={22} color={theme.danger} />
-            </AnimatedPressable>
+            <View style={styles.headerActions}>
+              <AnimatedPressable
+                onPress={compartirPdf}
+                disabled={exportando}
+                style={[styles.headerButton, { backgroundColor: exportando ? theme.backgroundSelected : theme.tint }]}>
+                <Ionicons name="share-outline" size={19} color={theme.ink} />
+              </AnimatedPressable>
+              <AnimatedPressable
+                onPress={confirmarEliminarReceta}
+                style={[styles.headerButton, { backgroundColor: theme.dangerSoft }]}>
+                <Ionicons name="trash-outline" size={19} color={theme.danger} />
+              </AnimatedPressable>
+            </View>
           ),
         }}
       />
@@ -762,6 +788,8 @@ function Macro({ label, value, color }: { label: string; value: number; color: s
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  headerButton: { width: 36, height: 36, borderRadius: Radius.pill, alignItems: 'center', justifyContent: 'center' },
   content: { padding: Spacing.three, gap: Spacing.two, paddingBottom: Spacing.six },
   nombreInput: { fontSize: 22, fontWeight: '600', paddingVertical: Spacing.one },
   clienteBadge: { flexDirection: 'row', alignItems: 'center', gap: 4 },

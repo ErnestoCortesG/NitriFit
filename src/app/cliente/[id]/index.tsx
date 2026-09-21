@@ -17,13 +17,14 @@ import {
   type Receta,
   agregarHistorial,
   crearReceta,
-  eliminarCliente,
   listarHistorial,
   listarRecetasCliente,
   obtenerCliente,
+  totalCaloriasPorReceta,
 } from '@/db/database';
 import { useTheme } from '@/hooks/use-theme';
 import { ACTIVIDAD_LABEL, calcularGastoEstimado, calcularIMC, calcularTMB } from '@/lib/calculos';
+import { exportarClientePdf } from '@/lib/pdf-cliente';
 
 function StatCard({
   label,
@@ -73,6 +74,7 @@ export default function ClienteDetalleScreen() {
   const [historial, setHistorial] = useState<HistorialEntry[]>([]);
   const [nota, setNota] = useState('');
   const [recetas, setRecetas] = useState<Receta[]>([]);
+  const [exportando, setExportando] = useState(false);
 
   const cargar = useCallback(() => {
     obtenerCliente(clienteId).then(setCliente);
@@ -90,21 +92,6 @@ export default function ClienteDetalleScreen() {
   const tmb = calcularTMB(cliente.pesoKg, cliente.tallaCm, cliente.edad, cliente.sexo);
   const gasto = calcularGastoEstimado(tmb, cliente.actividadTipo);
 
-  const confirmarEliminar = () => {
-    Alert.alert('Eliminar cliente', `¿Eliminar a ${cliente.nombre}? Esta acción no se puede deshacer.`, [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Eliminar',
-        style: 'destructive',
-        onPress: async () => {
-          await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
-          await eliminarCliente(clienteId);
-          router.back();
-        },
-      },
-    ]);
-  };
-
   const guardarNota = async () => {
     if (!nota.trim()) return;
     await agregarHistorial(clienteId, 'nota', nota.trim());
@@ -119,6 +106,20 @@ export default function ClienteDetalleScreen() {
     router.push(`/receta/${id}`);
   };
 
+  const compartirClientePdf = async () => {
+    if (exportando) return;
+    setExportando(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    try {
+      const totales = await totalCaloriasPorReceta(clienteId);
+      await exportarClientePdf(cliente, recetas, totales);
+    } catch {
+      Alert.alert('No se pudo exportar', 'Ocurrió un problema al generar el PDF. Intenta de nuevo.');
+    } finally {
+      setExportando(false);
+    }
+  };
+
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen
@@ -126,11 +127,16 @@ export default function ClienteDetalleScreen() {
           title: cliente.nombre,
           headerRight: () => (
             <View style={styles.headerActions}>
-              <AnimatedPressable onPress={() => router.push(`/cliente/${clienteId}/editar`)} hitSlop={8}>
-                <Ionicons name="create-outline" size={22} color={theme.tint} />
+              <AnimatedPressable
+                onPress={compartirClientePdf}
+                disabled={exportando}
+                style={[styles.headerButton, { backgroundColor: exportando ? theme.backgroundSelected : theme.tint }]}>
+                <Ionicons name="share-outline" size={19} color={theme.ink} />
               </AnimatedPressable>
-              <AnimatedPressable onPress={confirmarEliminar} hitSlop={8}>
-                <Ionicons name="trash-outline" size={22} color={theme.danger} />
+              <AnimatedPressable
+                onPress={() => router.push(`/cliente/${clienteId}/editar`)}
+                style={[styles.headerButton, { backgroundColor: theme.accent }]}>
+                <Ionicons name="create-outline" size={19} color={theme.ink} />
               </AnimatedPressable>
             </View>
           ),
@@ -256,7 +262,8 @@ export default function ClienteDetalleScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  headerActions: { flexDirection: 'row', gap: Spacing.three },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  headerButton: { width: 36, height: 36, borderRadius: Radius.pill, alignItems: 'center', justifyContent: 'center' },
   content: { padding: Spacing.three, gap: Spacing.three, paddingBottom: Spacing.six },
   statsRow: { flexDirection: 'row', gap: Spacing.two },
   statCard: { flex: 1, borderRadius: Radius.medium, padding: Spacing.three, gap: 2 },

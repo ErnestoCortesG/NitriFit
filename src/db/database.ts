@@ -390,6 +390,33 @@ export async function listarRecetasCliente(clienteId: number): Promise<Receta[]>
   return rows.map(rowToReceta);
 }
 
+/** Total de kcal por receta de un cliente, en una sola consulta agregada — para el resumen del PDF del cliente, que no necesita el detalle de cada comida. */
+export async function totalCaloriasPorReceta(clienteId: number): Promise<Record<number, number>> {
+  const db = await getDb();
+  const rows = await db.getAllAsync<{ receta_id: number; total: number | null }>(
+    `SELECT r.id as receta_id, SUM(a.calorias_100g * ri.gramos / 100) as total
+     FROM recetas r
+     LEFT JOIN receta_items ri ON ri.receta_id = r.id
+     LEFT JOIN alimentos a ON a.id = ri.alimento_id
+     WHERE r.cliente_id = ?
+     GROUP BY r.id`,
+    clienteId
+  );
+  return Object.fromEntries(rows.map((r) => [r.receta_id, r.total ?? 0]));
+}
+
+/** Posición (1-based) de una receta entre las dietas de su cliente, por orden de creación — misma numeración que usa el resumen en PDF del cliente ("Dieta 1, Dieta 2…"), para que el nombre del archivo exportado coincida con ese resumen. */
+export async function numeroRecetaParaCliente(recetaId: number, clienteId: number): Promise<number> {
+  const db = await getDb();
+  const row = await db.getFirstAsync<{ numero: number }>(
+    `SELECT COUNT(*) + 1 as numero FROM recetas
+     WHERE cliente_id = ? AND creado_en < (SELECT creado_en FROM recetas WHERE id = ?)`,
+    clienteId,
+    recetaId
+  );
+  return row?.numero ?? 1;
+}
+
 export async function crearReceta(nombre: string, clienteId: number | null = null): Promise<number> {
   const db = await getDb();
   const res = await db.runAsync(
