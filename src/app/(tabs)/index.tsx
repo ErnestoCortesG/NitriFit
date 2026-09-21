@@ -49,7 +49,7 @@ export default function ClientesScreen() {
             style={[styles.addButton, Shadows.button as object, { backgroundColor: theme.tint }]}
             scaleTo={0.88}
             hitSlop={8}>
-            <Ionicons name="add" size={26} color={theme.inkText} />
+            <Ionicons name="add" size={26} color={theme.ink} />
           </AnimatedPressable>
         }>
         {clientes.length > 0 && (

@@ -213,7 +213,7 @@ function Chip({ label, selected, onPress }: { label: string; selected: boolean; 
           borderColor: selected ? theme.tint : theme.border,
         },
       ]}>
-      <ThemedText type="small" style={selected ? { color: theme.inkText } : undefined}>
+      <ThemedText type="small" style={selected ? { color: theme.ink } : undefined}>
         {label}
       </ThemedText>
     </AnimatedPressable>

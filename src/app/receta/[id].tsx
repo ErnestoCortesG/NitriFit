@@ -353,7 +353,7 @@ export default function RecetaEditorScreen() {
                   { borderColor: theme.border },
                   seleccionada && { backgroundColor: theme.tint, borderColor: theme.tint },
                 ]}>
-                <ThemedText type="small" themeColor={seleccionada ? 'inkText' : 'textSecondary'}>
+                <ThemedText type="small" themeColor={seleccionada ? 'ink' : 'textSecondary'}>
                   Comida {n}
                 </ThemedText>
               </AnimatedPressable>
@@ -441,7 +441,7 @@ export default function RecetaEditorScreen() {
                       { borderColor: theme.tint },
                       unidadPendiente === u && { backgroundColor: theme.tint },
                     ]}>
-                    <ThemedText type="small" themeColor={unidadPendiente === u ? 'inkText' : 'tint'}>
+                    <ThemedText type="small" themeColor={unidadPendiente === u ? 'ink' : 'tint'}>
                       {u === 'piezas' ? 'Piezas' : 'Gramos'}
                     </ThemedText>
                   </AnimatedPressable>
@@ -477,7 +477,7 @@ export default function RecetaEditorScreen() {
                 onPress={confirmarAgregar}
                 scaleTo={0.9}
                 style={[styles.confirmButton, { backgroundColor: theme.tint }]}>
-                <Ionicons name="checkmark" size={18} color={theme.inkText} />
+                <Ionicons name="checkmark" size={18} color={theme.ink} />
               </AnimatedPressable>
               <AnimatedPressable onPress={() => setPendiente(null)} scaleTo={0.9} hitSlop={8}>
                 <Ionicons name="close" size={22} color={theme.textSecondary} />
@@ -544,7 +544,7 @@ export default function RecetaEditorScreen() {
               onPress={agregarManual}
               style={[styles.manualAddButton, { backgroundColor: theme.tint }]}
               scaleTo={0.95}>
-              <ThemedText themeColor="inkText" type="smallBold">
+              <ThemedText themeColor="ink" type="smallBold">
                 Agregar a la receta
               </ThemedText>
             </AnimatedPressable>
@@ -643,7 +643,7 @@ export default function RecetaEditorScreen() {
                                   { borderColor: theme.tint },
                                   unidadEditorTipo === u && { backgroundColor: theme.tint },
                                 ]}>
-                                <ThemedText type="small" themeColor={unidadEditorTipo === u ? 'inkText' : 'tint'}>
+                                <ThemedText type="small" themeColor={unidadEditorTipo === u ? 'ink' : 'tint'}>
                                   {u === 'piezas' ? 'Piezas' : 'Gramos'}
                                 </ThemedText>
                               </AnimatedPressable>
@@ -674,7 +674,7 @@ export default function RecetaEditorScreen() {
                               onPress={guardarUnidad}
                               scaleTo={0.9}
                               style={[styles.confirmButton, { backgroundColor: theme.tint }]}>
-                              <Ionicons name="checkmark" size={18} color={theme.inkText} />
+                              <Ionicons name="checkmark" size={18} color={theme.ink} />
                             </AnimatedPressable>
                             <AnimatedPressable onPress={() => setUnidadEditando(null)} scaleTo={0.9} hitSlop={8}>
                               <Ionicons name="close" size={22} color={theme.textSecondary} />
@@ -711,7 +711,7 @@ export default function RecetaEditorScreen() {
                               onPress={guardarIG}
                               scaleTo={0.9}
                               style={[styles.confirmButton, { backgroundColor: theme.accent }]}>
-                              <Ionicons name="checkmark" size={18} color={theme.inkText} />
+                              <Ionicons name="checkmark" size={18} color={theme.ink} />
                             </AnimatedPressable>
                             <AnimatedPressable onPress={() => setIgEditando(null)} scaleTo={0.9} hitSlop={8}>
                               <Ionicons name="close" size={22} color={theme.textSecondary} />

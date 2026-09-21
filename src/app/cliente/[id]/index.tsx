@@ -227,7 +227,7 @@ export default function ClienteDetalleScreen() {
             style={[styles.notaButton, Shadows.button as object, { backgroundColor: theme.tint }]}
             scaleTo={0.88}
             hitSlop={8}>
-            <Ionicons name="send" size={18} color={theme.inkText} />
+            <Ionicons name="send" size={18} color={theme.ink} />
           </AnimatedPressable>
         </View>
 
