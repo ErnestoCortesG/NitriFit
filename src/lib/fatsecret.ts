@@ -14,6 +14,10 @@
 // cae automáticamente a USDA, así que la app sigue funcionando igual.
 import { traducirConsultaAlimento, traducirNombreAlimento } from '@/lib/alimentos-es';
 
+// http, no https — la VM todavía no tiene TLS. Android bloquea tráfico HTTP
+// sin cifrar por defecto en apps compiladas (a diferencia de Expo Go), así
+// que app.json declara usesCleartextTraffic vía expo-build-properties; sin
+// eso, este fetch falla silenciosamente y todo cae a USDA.
 const PROXY_URL = 'http://159.54.147.43:8080';
 // Clave compartida simple entre la app y el proxy (ver PROXY_KEY en
 // fatsecret-proxy/.env) — no es seguridad fuerte, viaja embebida en la app
