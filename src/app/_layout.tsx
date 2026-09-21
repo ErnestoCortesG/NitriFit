@@ -1,5 +1,8 @@
 import { Fraunces_600SemiBold, Fraunces_700Bold } from '@expo-google-fonts/fraunces';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import { Lato_400Regular, Lato_700Bold } from '@expo-google-fonts/lato';
+import { PlayfairDisplay_600SemiBold, PlayfairDisplay_700Bold } from '@expo-google-fonts/playfair-display';
+import { Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -17,6 +20,15 @@ export default function RootLayout() {
     Inter_600SemiBold,
     Fraunces_600SemiBold,
     Fraunces_700Bold,
+    // Combinaciones tipográficas seleccionables en Plantillas — ver
+    // src/lib/plantillas.ts (FUENTES).
+    Poppins_400Regular,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+    PlayfairDisplay_600SemiBold,
+    PlayfairDisplay_700Bold,
+    Lato_400Regular,
+    Lato_700Bold,
   });
 
   // Se mantiene el splash nativo (preventAutoHideAsync) hasta que las
@@ -54,6 +66,8 @@ function RootStack() {
           options={{ title: 'Editar cliente', presentation: 'modal' }}
         />
         <Stack.Screen name="receta/[id]" options={{ title: 'Receta' }} />
+        <Stack.Screen name="plantilla/nuevo" options={{ title: 'Nueva plantilla', presentation: 'modal' }} />
+        <Stack.Screen name="plantilla/[id]" options={{ title: 'Editar plantilla', presentation: 'modal' }} />
       </Stack>
     </ThemeProvider>
   );

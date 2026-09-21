@@ -1,7 +1,8 @@
 import * as Sharing from 'expo-sharing';
 
-import type { Cliente, Receta } from '@/db/database';
+import type { Cliente, Plantilla, Receta } from '@/db/database';
 import { ACTIVIDAD_LABEL, calcularGastoEstimado, calcularIMC, calcularTMB } from '@/lib/calculos';
+import { fondoCssBackground, fondoInfo, fuenteInfo, tamanoInfo } from '@/lib/plantillas';
 import {
   PDF_BASE_STYLE,
   PDF_COLORS,
@@ -31,7 +32,8 @@ function renderDietaRow(numero: number, totalKcal: number): string {
 export function generarClienteHtml(
   cliente: Cliente,
   recetas: Receta[],
-  totalesPorReceta: Record<number, number>
+  totalesPorReceta: Record<number, number>,
+  plantilla: Plantilla | null = null
 ): string {
   const imc = calcularIMC(cliente.pesoKg, cliente.tallaCm);
   const tmb = calcularTMB(cliente.pesoKg, cliente.tallaCm, cliente.edad, cliente.sexo);
@@ -45,11 +47,45 @@ export function generarClienteHtml(
     (a, b) => new Date(a.creadoEn).getTime() - new Date(b.creadoEn).getTime()
   );
 
+  const fuente = plantilla ? fuenteInfo(plantilla.fuente) : null;
+  const tamano = plantilla ? tamanoInfo(plantilla.tamanoFuente) : null;
+  const fontLink = fuente
+    ? `<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?${fuente.googleFontsHref}&display=swap" />`
+    : '';
+  const plantillaStyle = plantilla
+    ? `body { font-family: ${fuente!.bodyCss}; font-size: ${tamano!.bodyPx}px; } h1, h2 { font-family: ${fuente!.headingCss}; } h1 { font-size: ${tamano!.headingPx}px; }`
+    : '';
+
+  // El fondo de la sección se distingue por tipo de documento: recetas usan
+  // el fondo de receta de la plantilla, rutinas el de rutina — aunque
+  // Rutinas todavía no exista como función, la sección ya queda lista con
+  // su propio estilo para cuando sí la haya.
+  const seccionDietas = `
+  <h2>Dietas</h2>
+  <div class="seccion" style="background:${plantilla ? fondoCssBackground(fondoInfo(plantilla.fondoReceta)) : PDF_COLORS.bgSoft}">
+    ${
+      recetasOrdenadas.length === 0
+        ? `<p class="vacio">Sin dietas todavía para este cliente.</p>`
+        : `<table><tbody>${recetasOrdenadas
+            .map((r, i) => renderDietaRow(i + 1, totalesPorReceta[r.id] ?? 0))
+            .join('')}</tbody></table>`
+    }
+  </div>`;
+
+  const seccionRutinas = plantilla
+    ? `
+  <h2>Rutinas</h2>
+  <div class="seccion" style="background:${fondoCssBackground(fondoInfo(plantilla.fondoRutina))}">
+    <p class="vacio">Próximamente.</p>
+  </div>`
+    : '';
+
   return `
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8" />
+${fontLink}
 <style>
   ${PDF_BASE_STYLE}
   .info-box {
@@ -67,12 +103,14 @@ export function generarClienteHtml(
     font-weight: 700;
     margin: 0 0 8px;
   }
+  .seccion { border-radius: 10px; padding: 12px 16px; margin-bottom: 22px; }
   table { width: 100%; border-collapse: collapse; }
   td { padding: 7px 0; border-bottom: 1px solid ${PDF_COLORS.border}; font-size: 13px; }
   tr:last-child td { border-bottom: none; }
   td.numero { font-weight: 600; }
   td.kcal { text-align: right; color: ${PDF_COLORS.tint}; font-variant-numeric: tabular-nums; font-weight: 600; }
-  .vacio { color: ${PDF_COLORS.textSecondary}; font-size: 12.5px; }
+  .vacio { color: ${PDF_COLORS.textSecondary}; font-size: 12.5px; margin: 0; }
+  ${plantillaStyle}
 </style>
 </head>
 <body>
@@ -98,14 +136,8 @@ export function generarClienteHtml(
       : ''
   }
 
-  <h2>Dietas</h2>
-  ${
-    recetasOrdenadas.length === 0
-      ? `<p class="vacio">Sin dietas todavía para este cliente.</p>`
-      : `<table><tbody>${recetasOrdenadas
-          .map((r, i) => renderDietaRow(i + 1, totalesPorReceta[r.id] ?? 0))
-          .join('')}</tbody></table>`
-  }
+  ${seccionDietas}
+  ${seccionRutinas}
 
   ${pdfFooter(fecha)}
 </body>
@@ -115,9 +147,10 @@ export function generarClienteHtml(
 export async function exportarClientePdf(
   cliente: Cliente,
   recetas: Receta[],
-  totalesPorReceta: Record<number, number>
+  totalesPorReceta: Record<number, number>,
+  plantilla: Plantilla | null = null
 ): Promise<void> {
-  const html = generarClienteHtml(cliente, recetas, totalesPorReceta);
+  const html = generarClienteHtml(cliente, recetas, totalesPorReceta, plantilla);
   const uri = await guardarComoPdf(html, slugifyFilename(cliente.nombre));
   if (await Sharing.isAvailableAsync()) {
     await Sharing.shareAsync(uri, {

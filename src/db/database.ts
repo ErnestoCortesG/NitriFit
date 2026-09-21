@@ -81,6 +81,30 @@ export interface RecetaItem {
   alimento: Alimento;
 }
 
+export type FuentePlantilla = 'editorial' | 'moderno' | 'clasico';
+export type TamanoFuentePlantilla = 'chico' | 'mediano' | 'grande';
+export type IntensidadMarcaAgua = 'sutil' | 'visible';
+
+export interface Plantilla {
+  id: number;
+  nombre: string;
+  // Clave de fondo (ver FONDOS en src/lib/plantillas.ts) — color plano o
+  // patrón ilustrado. Separado por tipo de documento: una plantilla exporta
+  // sus recetas con un fondo y sus rutinas con otro.
+  fondoReceta: string;
+  fondoRutina: string;
+  // Texto repetido en diagonal sobre el documento (ej. nombre de la clínica). Null = sin marca de agua.
+  marcaAguaTexto: string | null;
+  marcaAguaIntensidad: IntensidadMarcaAgua;
+  fuente: FuentePlantilla;
+  tamanoFuente: TamanoFuentePlantilla;
+  // Ícono decorativo en la esquina del documento — clave del set fijo, null = sin sticker.
+  sticker: string | null;
+  creadoEn: string;
+}
+
+export type NuevaPlantilla = Omit<Plantilla, 'id' | 'creadoEn'>;
+
 const DB_NAME = 'nutrifit.db';
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
@@ -141,6 +165,18 @@ function getDb() {
           clave TEXT PRIMARY KEY,
           valor TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS plantillas (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          nombre TEXT NOT NULL,
+          fondo_receta TEXT NOT NULL DEFAULT 'blanco',
+          fondo_rutina TEXT NOT NULL DEFAULT 'blanco',
+          marca_agua_texto TEXT,
+          marca_agua_intensidad TEXT NOT NULL DEFAULT 'sutil',
+          fuente TEXT NOT NULL DEFAULT 'editorial',
+          tamano_fuente TEXT NOT NULL DEFAULT 'mediano',
+          sticker TEXT,
+          creado_en TEXT NOT NULL
+        );
       `);
       // Migraciones para bases ya creadas antes de estas columnas: SQLite no
       // soporta "ADD COLUMN IF NOT EXISTS", así que se intentan y se ignora
@@ -149,6 +185,12 @@ function getDb() {
       await db.execAsync('ALTER TABLE receta_items ADD COLUMN piezas REAL').catch(() => {});
       await db.execAsync('ALTER TABLE alimentos ADD COLUMN gramos_por_pieza REAL').catch(() => {});
       await db.execAsync('ALTER TABLE recetas ADD COLUMN cliente_id INTEGER REFERENCES clientes(id) ON DELETE CASCADE').catch(() => {});
+      // El fondo de una plantilla solía ser un solo color compartido — ahora
+      // se separa por tipo de documento (receta/rutina). Las filas creadas
+      // antes de ese cambio no tienen un fondo por color que mapear 1:1 a
+      // una clave nueva, así que simplemente caen al fondo "blanco".
+      await db.execAsync("ALTER TABLE plantillas ADD COLUMN fondo_receta TEXT NOT NULL DEFAULT 'blanco'").catch(() => {});
+      await db.execAsync("ALTER TABLE plantillas ADD COLUMN fondo_rutina TEXT NOT NULL DEFAULT 'blanco'").catch(() => {});
       return db;
     });
   }
@@ -528,4 +570,71 @@ export async function guardarPreferencia(clave: string, valor: string): Promise<
     clave,
     valor
   );
+}
+
+function rowToPlantilla(r: any): Plantilla {
+  return {
+    id: r.id,
+    nombre: r.nombre,
+    fondoReceta: r.fondo_receta,
+    fondoRutina: r.fondo_rutina,
+    marcaAguaTexto: r.marca_agua_texto,
+    marcaAguaIntensidad: r.marca_agua_intensidad,
+    fuente: r.fuente,
+    tamanoFuente: r.tamano_fuente,
+    sticker: r.sticker,
+    creadoEn: r.creado_en,
+  };
+}
+
+export async function listarPlantillas(): Promise<Plantilla[]> {
+  const db = await getDb();
+  const rows = await db.getAllAsync('SELECT * FROM plantillas ORDER BY creado_en DESC');
+  return rows.map(rowToPlantilla);
+}
+
+export async function obtenerPlantilla(id: number): Promise<Plantilla | null> {
+  const db = await getDb();
+  const row = await db.getFirstAsync('SELECT * FROM plantillas WHERE id = ?', id);
+  return row ? rowToPlantilla(row) : null;
+}
+
+export async function crearPlantilla(p: NuevaPlantilla): Promise<number> {
+  const db = await getDb();
+  const res = await db.runAsync(
+    `INSERT INTO plantillas (nombre, fondo_receta, fondo_rutina, marca_agua_texto, marca_agua_intensidad, fuente, tamano_fuente, sticker, creado_en)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    p.nombre,
+    p.fondoReceta,
+    p.fondoRutina,
+    p.marcaAguaTexto,
+    p.marcaAguaIntensidad,
+    p.fuente,
+    p.tamanoFuente,
+    p.sticker,
+    new Date().toISOString()
+  );
+  return res.lastInsertRowId;
+}
+
+export async function actualizarPlantilla(id: number, p: NuevaPlantilla): Promise<void> {
+  const db = await getDb();
+  await db.runAsync(
+    `UPDATE plantillas SET nombre = ?, fondo_receta = ?, fondo_rutina = ?, marca_agua_texto = ?, marca_agua_intensidad = ?, fuente = ?, tamano_fuente = ?, sticker = ?
+     WHERE id = ?`,
+    p.nombre,
+    p.fondoReceta,
+    p.fondoRutina,
+    p.marcaAguaTexto,
+    p.marcaAguaIntensidad,
+    p.fuente,
+    p.tamanoFuente,
+    p.sticker,
+    id
+  );
+}
+
+export async function eliminarPlantilla(id: number): Promise<void> {
+  const db = await getDb();
+  await db.runAsync('DELETE FROM plantillas WHERE id = ?', id);
 }

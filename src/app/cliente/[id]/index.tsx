@@ -8,16 +8,19 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { AnimatedCounter } from '@/components/animated-counter';
 import { AnimatedPressable } from '@/components/animated-pressable';
 import { HideKeyboardButton } from '@/components/hide-keyboard-button';
+import { PlantillaPickerSheet } from '@/components/plantilla-picker-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Radius, Shadows, Spacing } from '@/constants/theme';
 import {
   type Cliente,
   type HistorialEntry,
+  type Plantilla,
   type Receta,
   agregarHistorial,
   crearReceta,
   listarHistorial,
+  listarPlantillas,
   listarRecetasCliente,
   obtenerCliente,
   totalCaloriasPorReceta,
@@ -75,6 +78,8 @@ export default function ClienteDetalleScreen() {
   const [nota, setNota] = useState('');
   const [recetas, setRecetas] = useState<Receta[]>([]);
   const [exportando, setExportando] = useState(false);
+  const [plantillasDisponibles, setPlantillasDisponibles] = useState<Plantilla[]>([]);
+  const [selectorVisible, setSelectorVisible] = useState(false);
 
   const cargar = useCallback(() => {
     obtenerCliente(clienteId).then(setCliente);
@@ -106,18 +111,28 @@ export default function ClienteDetalleScreen() {
     router.push(`/receta/${id}`);
   };
 
-  const compartirClientePdf = async () => {
-    if (exportando) return;
+  const exportarClienteConPlantilla = async (plantilla: Plantilla | null) => {
     setExportando(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     try {
       const totales = await totalCaloriasPorReceta(clienteId);
-      await exportarClientePdf(cliente, recetas, totales);
+      await exportarClientePdf(cliente, recetas, totales, plantilla);
     } catch {
       Alert.alert('No se pudo exportar', 'Ocurrió un problema al generar el PDF. Intenta de nuevo.');
     } finally {
       setExportando(false);
     }
+  };
+
+  const compartirClientePdf = async () => {
+    if (exportando) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    const plantillas = await listarPlantillas();
+    if (plantillas.length === 0) {
+      exportarClienteConPlantilla(null);
+      return;
+    }
+    setPlantillasDisponibles(plantillas);
+    setSelectorVisible(true);
   };
 
   return (
@@ -256,6 +271,12 @@ export default function ClienteDetalleScreen() {
         )}
       </ScrollView>
       <HideKeyboardButton />
+      <PlantillaPickerSheet
+        visible={selectorVisible}
+        plantillas={plantillasDisponibles}
+        onClose={() => setSelectorVisible(false)}
+        onSelect={exportarClienteConPlantilla}
+      />
     </ThemedView>
   );
 }

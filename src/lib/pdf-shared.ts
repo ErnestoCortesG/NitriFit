@@ -112,3 +112,44 @@ export function pdfFooter(fecha: string): string {
     <span>${fecha}</span>
   </div>`;
 }
+
+/**
+ * Marca de agua: texto repetido en diagonal sobre toda la página. Se genera
+ * como una cuadrícula de <text> rotados en un SVG a pantalla completa, en
+ * vez de un patrón CSS tileable — más simple de controlar (espaciado,
+ * rotación) sin depender de que el tile encaje perfecto.
+ */
+export function renderWatermark(texto: string, opacidad: number): string {
+  const filas = 9;
+  const columnas = 4;
+  const textos: string[] = [];
+  for (let f = 0; f < filas; f++) {
+    for (let c = 0; c < columnas; c++) {
+      const x = c * 240 + (f % 2 === 0 ? 30 : 150);
+      const y = f * 160 + 70;
+      textos.push(`<text x="${x}" y="${y}" transform="rotate(-28 ${x} ${y})">${escapeHtml(texto)}</text>`);
+    }
+  }
+  return `
+  <svg class="watermark" viewBox="0 0 900 1400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <g fill="${PDF_COLORS.ink}" opacity="${opacidad}" font-family="-apple-system, Helvetica, sans-serif" font-size="26" font-weight="700">
+      ${textos.join('')}
+    </g>
+  </svg>`;
+}
+
+/** Ícono decorativo fijo en la esquina inferior derecha del documento. */
+export function renderSticker(svgInnerPath: string, color: string): string {
+  return `
+  <div class="sticker">
+    <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+      ${svgInnerPath}
+    </svg>
+  </div>`;
+}
+
+export const WATERMARK_STICKER_CSS = `
+  .watermark { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+  .sticker { position: fixed; bottom: 26px; right: 30px; z-index: 1; opacity: 0.9; }
+  .page-content { position: relative; z-index: 1; }
+`;

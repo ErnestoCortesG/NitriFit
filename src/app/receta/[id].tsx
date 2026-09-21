@@ -8,10 +8,12 @@ import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { AnimatedCounter } from '@/components/animated-counter';
 import { AnimatedPressable } from '@/components/animated-pressable';
 import { HideKeyboardButton } from '@/components/hide-keyboard-button';
+import { PlantillaPickerSheet } from '@/components/plantilla-picker-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Radius, Shadows, Spacing } from '@/constants/theme';
 import {
+  type Plantilla,
   type Receta,
   type RecetaItem,
   actualizarGramosItem,
@@ -24,6 +26,7 @@ import {
   eliminarReceta,
   eliminarRecetaItem,
   guardarObservaciones,
+  listarPlantillas,
   listarRecetaItems,
   obtenerCliente,
   obtenerReceta,
@@ -278,18 +281,31 @@ export default function RecetaEditorScreen() {
   };
 
   const [exportando, setExportando] = useState(false);
+  const [plantillasDisponibles, setPlantillasDisponibles] = useState<Plantilla[]>([]);
+  const [selectorVisible, setSelectorVisible] = useState(false);
 
-  const compartirPdf = async () => {
-    if (!receta || exportando) return;
+  const exportarConPlantilla = async (plantilla: Plantilla | null) => {
+    if (!receta) return;
     setExportando(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     try {
-      await exportarRecetaPdf(receta, items, clienteNombre);
+      await exportarRecetaPdf(receta, items, clienteNombre, plantilla);
     } catch {
       Alert.alert('No se pudo exportar', 'Ocurrió un problema al generar el PDF. Intenta de nuevo.');
     } finally {
       setExportando(false);
     }
+  };
+
+  const compartirPdf = async () => {
+    if (!receta || exportando) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    const plantillas = await listarPlantillas();
+    if (plantillas.length === 0) {
+      exportarConPlantilla(null);
+      return;
+    }
+    setPlantillasDisponibles(plantillas);
+    setSelectorVisible(true);
   };
 
   const confirmarEliminarReceta = () => {
@@ -769,6 +785,12 @@ export default function RecetaEditorScreen() {
         />
       </ScrollView>
       <HideKeyboardButton />
+      <PlantillaPickerSheet
+        visible={selectorVisible}
+        plantillas={plantillasDisponibles}
+        onClose={() => setSelectorVisible(false)}
+        onSelect={exportarConPlantilla}
+      />
     </ThemedView>
   );
 }

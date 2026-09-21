@@ -1,13 +1,24 @@
 import * as Sharing from 'expo-sharing';
 
-import { numeroRecetaParaCliente, type Receta, type RecetaItem } from '@/db/database';
+import { numeroRecetaParaCliente, type Plantilla, type Receta, type RecetaItem } from '@/db/database';
+import {
+  INTENSIDAD_OPACIDAD,
+  fondoCssBackground,
+  fondoInfo,
+  fuenteInfo,
+  stickerSvgPath,
+  tamanoInfo,
+} from '@/lib/plantillas';
 import {
   PDF_BASE_STYLE,
   PDF_COLORS,
+  WATERMARK_STICKER_CSS,
   escapeHtml,
   formatFecha,
   guardarComoPdf,
   pdfFooter,
+  renderSticker,
+  renderWatermark,
   slugifyFilename,
   statTile,
 } from '@/lib/pdf-shared';
@@ -69,16 +80,45 @@ function renderGrupo(grupo: { comida: number; items: RecetaItem[] }): string {
     </section>`;
 }
 
-export function generarRecetaHtml(receta: Receta, items: RecetaItem[], clienteNombre: string | null): string {
+export function generarRecetaHtml(
+  receta: Receta,
+  items: RecetaItem[],
+  clienteNombre: string | null,
+  plantilla: Plantilla | null = null
+): string {
   const totales = calcularTotales(items);
   const grupos = agruparPorComida(items);
   const fecha = formatFecha(receta.creadoEn);
+
+  const fuente = plantilla ? fuenteInfo(plantilla.fuente) : null;
+  const tamano = plantilla ? tamanoInfo(plantilla.tamanoFuente) : null;
+
+  const fontLink = fuente
+    ? `<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="stylesheet" href="https://fonts.googleapis.com/css2?${fuente.googleFontsHref}&display=swap" />`
+    : '';
+
+  const plantillaStyle = plantilla
+    ? `
+  ${WATERMARK_STICKER_CSS}
+  body { background: ${fondoCssBackground(fondoInfo(plantilla.fondoReceta))}; font-family: ${fuente!.bodyCss}; font-size: ${tamano!.bodyPx}px; }
+  h1, .grupo-head h3, .observaciones h3 { font-family: ${fuente!.headingCss}; }
+  h1 { font-size: ${tamano!.headingPx}px; }`
+    : '';
+
+  const watermarkHtml =
+    plantilla?.marcaAguaTexto?.trim() && plantilla
+      ? renderWatermark(plantilla.marcaAguaTexto.trim(), INTENSIDAD_OPACIDAD[plantilla.marcaAguaIntensidad])
+      : '';
+  const stickerHtml = plantilla?.sticker
+    ? renderSticker(stickerSvgPath(plantilla.sticker), PDF_COLORS.tint)
+    : '';
 
   return `
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8" />
+${fontLink}
 <style>
   ${PDF_BASE_STYLE}
   .grupo { margin-bottom: 18px; }
@@ -118,9 +158,13 @@ export function generarRecetaHtml(receta: Receta, items: RecetaItem[], clienteNo
     margin: 0 0 6px;
   }
   .observaciones p { margin: 0; white-space: pre-wrap; font-size: 12.5px; }
+  ${plantillaStyle}
 </style>
 </head>
 <body>
+  ${watermarkHtml}
+  ${stickerHtml}
+  <div class="page-content">
   <div class="brand">NutriFit</div>
   <h1>${escapeHtml(receta.nombre)}</h1>
   <div class="meta">${[clienteNombre ? `Para ${escapeHtml(clienteNombre)}` : null, fecha].filter(Boolean).join(' · ')}</div>
@@ -141,6 +185,7 @@ export function generarRecetaHtml(receta: Receta, items: RecetaItem[], clienteNo
   }
 
   ${pdfFooter(fecha)}
+  </div>
 </body>
 </html>`;
 }
@@ -148,9 +193,10 @@ export function generarRecetaHtml(receta: Receta, items: RecetaItem[], clienteNo
 export async function exportarRecetaPdf(
   receta: Receta,
   items: RecetaItem[],
-  clienteNombre: string | null
+  clienteNombre: string | null,
+  plantilla: Plantilla | null = null
 ): Promise<void> {
-  const html = generarRecetaHtml(receta, items, clienteNombre);
+  const html = generarRecetaHtml(receta, items, clienteNombre, plantilla);
 
   // Nombre del archivo: "cliente-receta(N)" si pertenece a un cliente (misma
   // numeración que el resumen del cliente), o el nombre propio de la receta
