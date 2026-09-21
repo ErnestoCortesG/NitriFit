@@ -35,6 +35,10 @@ export function HeaderBand({
         </View>
         {children}
       </SafeAreaView>
+      <View style={styles.accentStrip}>
+        <View style={[styles.accentHalf, { backgroundColor: theme.tint }]} />
+        <View style={[styles.accentHalf, { backgroundColor: theme.accent }]} />
+      </View>
     </View>
   );
 }
@@ -46,6 +50,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingBottom: Spacing.four,
     zIndex: 2,
+    overflow: 'hidden',
+  },
+  accentStrip: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
+    height: 3,
+  },
+  accentHalf: {
+    flex: 1,
   },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: Spacing.two },
   actions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },

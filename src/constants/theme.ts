@@ -1,7 +1,9 @@
 /**
- * Paleta de marca de NutriFit — "clínico, cálido, con oficio". Grafito cálido
- * + terracota (nada de verde-menta genérico de app de salud), con Fraunces
- * (serif, encabezados) + Inter (sans, cuerpo) para un tono editorial/profesional.
+ * Paleta de marca de NutriFit — "clínico, cálido, con oficio". Base grafito
+ * cálido + tostado (nada de fondo verde-menta genérico de app de salud);
+ * `tint` (naranja) y `accent` (verde) son los acentos del monograma del ícono,
+ * con Fraunces (serif, encabezados) + Inter (sans, cuerpo) para un tono
+ * editorial/profesional.
  */
 
 import '@/global.css';
@@ -19,10 +21,10 @@ export const Colors = {
     ink: '#1C1B1A',
     inkText: '#F5F1EA',
     inkTextSecondary: '#B8AFA0',
-    tint: '#C9642B',
-    tintSoft: '#F3E1D2',
-    accent: '#6B7A4F',
-    accentSoft: '#E7EBDD',
+    tint: '#FF7A29',
+    tintSoft: '#FFE4CE',
+    accent: '#1FD672',
+    accentSoft: '#DBF7E7',
     danger: '#B23A3A',
     dangerSoft: '#F5DEDA',
   },
@@ -36,10 +38,10 @@ export const Colors = {
     ink: '#0F0E0D',
     inkText: '#F5F1EA',
     inkTextSecondary: '#8F887C',
-    tint: '#E08A4F',
-    tintSoft: '#3A2A1E',
-    accent: '#8FA06B',
-    accentSoft: '#293221',
+    tint: '#FF8A42',
+    tintSoft: '#3D2A1B',
+    accent: '#2EE082',
+    accentSoft: '#1B3324',
     danger: '#E27575',
     dangerSoft: '#3A2323',
   },

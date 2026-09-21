@@ -73,7 +73,7 @@ function TabButton({
         style={[styles.label, { color: focused ? theme.tint : theme.inkTextSecondary, fontFamily: Fonts.sansMedium }]}>
         {label}
       </ThemedText>
-      <Animated.View style={[styles.dot, { backgroundColor: theme.tint }, dotStyle]} />
+      <Animated.View style={[styles.dot, { backgroundColor: theme.accent }, dotStyle]} />
     </Pressable>
   );
 }
