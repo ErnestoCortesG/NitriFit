@@ -1,56 +1,74 @@
-# Welcome to your Expo app 👋
+# NutriFit
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App Android para entrenadores personales y nutriólogos: crea recetas y rutinas de entrenamiento, exporta como PDF y comparte por WhatsApp/correo. Incluye catálogo de clientes con cálculos corporales (IMC, TMB) y plantillas de diseño personalizables.
 
-## Get started
+---
 
-1. Install dependencies
+## Estado actual · 19 oct 2026
 
-   ```bash
-   npm install
-   ```
+| | |
+|---|---|
+| **Stack** | Expo SDK 57 · React Native · TypeScript · expo-router · expo-sqlite |
+| **Target** | Android APK (EAS Build) |
+| **Repo** | Local únicamente — **sin remote en GitHub** |
+| **Último commit** | `3e18281` · Fix FatSecret search falling back to USDA in built APK |
+| **Build EAS** | `@netoexpo/nutrifit-app` (id `dfaac965-4d32-4c8b-9506-6b78ebdb6a01`) |
 
-2. Start the app
+### Módulos completados
 
-   ```bash
-   npx expo start
-   ```
+| Módulo | Estado |
+|---|---|
+| **Clientes** | ✅ Completo — catálogo, datos corporales, IMC/TMB |
+| **Recetas** | ✅ Completo — búsqueda FatSecret/USDA, composición nutricional |
+| **Plantillas** | ✅ Completo — fondo de color / ilustración, tipografías Google Fonts, escala, marca de agua, sticker |
+| **PDF Export** | ✅ Completo — por receta y por cliente; selector de plantilla; compartir WhatsApp/email |
+| **Rutinas** | 🚧 Pendiente — placeholder "Próximamente"; sin modelo de datos ni pantallas |
 
-In the output, you'll find options to open the app in a
+### Palette y diseño
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Superficie: grafito cálido `#1C1B1A` + tostado (dark-only)
+- Tint (naranja): `#FF7A29` · Accent (verde): `#1FD672` — tomados del ícono de la app
+- Tipografía: Fraunces (headings) + Inter (body)
+- Ícono y splash actualizados; monograma NF en dos tonos
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Búsqueda de alimentos
 
-## Get a fresh project
+Dual-source: FatSecret primero (vía proxy VM en `159.54.147.43:8000`) → fallback automático USDA + diccionario de traducción. El proxy mantiene las credenciales FatSecret; la app nunca las tiene directamente.
 
-When you're ready, run:
+**Gotcha en APK real:** el dominio del proxy es HTTP (HTTPS pendiente); el APK requiere `android:usesCleartextTraffic="true"` en el AndroidManifest para que FatSecret funcione en builds de producción.
+
+---
+
+## Inicio rápido (desarrollo)
 
 ```bash
-npm run reset-project
+cd nutrifit-app
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Escanea el QR con la app **Expo Go** en el teléfono (Android o iOS). Expo Go requiere sesión iniciada en la app del teléfono para conectarse.
 
-### Other setup steps
+### Gotchas conocidos
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+- `npx expo install <pkg>` falla en esta máquina (`EALLOWSCRIPTS`). Alternativa: agregar el paquete a `package.json` manualmente y correr `npm install`.
+- Para validar el bundle de Android: `?platform=android` con header `Expo-Platform: android`.
 
-## Learn more
+---
 
-To learn more about developing your project with Expo, look at the following resources:
+## Build APK (producción)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npx eas-cli build --profile preview --platform android --non-interactive
+```
 
-## Join the community
+- La cola de EAS (tier gratuito) puede tomar 30–45+ min antes de compilar.
+- Monitorear con `npx eas-cli build:view <build-id>`.
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Pendientes
+
+- Módulo **Rutinas**: definir modelo de datos y construir pantallas
+- **HTTPS** en el proxy FatSecret (Oracle Linux VM `159.54.147.43`)
+- Crear **remote en GitHub** para el repo (actualmente solo local)
+- Verificar fix de cleartext-traffic en nueva build APK (`3e18281`)
